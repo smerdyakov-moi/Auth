@@ -53,7 +53,7 @@
                     <small class = "mt-2 inline-block "><%= post.likes.length %></small>
                     <div class ="btns flex">
                         <a class="text-blue-500" href="/like/<%= post._id %>"><%= post.likes.indexOf(user._id)? "Like" : "Unike" %></a>
-                        <a class = "text-zinc-600" href="">Edit</a>
+                        <a class = "text-zinc-600" href="/postedit/<%= post._id %>">Edit</a>
                     </div>
                 </div>
               <%}) %>

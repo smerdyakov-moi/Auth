@@ -36,6 +36,11 @@ app.get ('/login', (req,res)=>{
     res.render('login')
 })
 
+app.get('/postedit/:id', async(req,res)=>{
+    let post = await postModel.findOne({_id:req.params.id}).populate("user")
+    res.render('editpost',{post})
+})
+
 app.post('/register',async (req,res)=>{
     let {email,password,username,name,age} = req.body
     let user = await userModel.findOne({email})
@@ -88,6 +93,12 @@ app.post('/updateProfile', isLoggedin, async(req,res)=>{
     let {username,name} = req.body
     console.log({username,name})
     await userModel.findOneAndUpdate({_id:req.user.userid},{username,name},{new:true})
+    res.redirect('/profile')
+})
+
+app.post ('/updatePost/:id', isLoggedin, async(req,res)=>{
+    let {caption,body} = req.body
+    let post = await postModel.findOneAndUpdate({_id:req.params.id},{caption,body}, {new:true}).populate('user')
     res.redirect('/profile')
 })
 
