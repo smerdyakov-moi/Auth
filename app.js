@@ -6,11 +6,17 @@ const bcrypt = require ('bcrypt')
 const jwt = require ('jsonwebtoken')
 const cookieParser = require('cookie-parser')
 const post = require('./models/post')
+const multer = require ('multer')
+const crypto = require ('crypto')
+const path = require ('path')
+const upload = require ('./configs/multer')
+const user = require('./models/user')
 
 app.set ('view engine','ejs')
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())
+app.use (express.static(path.join(__dirname,'public')))
 
 app.get('/',(req,res)=>{
     res.render('index')
@@ -22,9 +28,10 @@ app.get ('/profile',isLoggedin,async (req,res)=>{
 })
 
 app.get ('/like/:id',isLoggedin,async (req,res)=>{
-    let post = await postModel.findOne({_id:req.params.id}).populate("user")
+    let post = await postModel.findOne({_id:req.params.id})
     
-    if (post.likes.indexOf(req.user.userid) === -1) {post.likes.push(req.user.userid)}
+    if (post.likes.indexOf(req.user.userid) === -1) {post.likes.push(req.user.userid)} // in array of likes, checking whether the user has already liked the post or not
+    // this is achieved through passing the req.user.userid
     else {post.likes.splice(post.likes.indexOf(req.user.userid),1)}
     
     
@@ -37,8 +44,15 @@ app.get ('/login', (req,res)=>{
 })
 
 app.get('/postedit/:id', async(req,res)=>{
-    let post = await postModel.findOne({_id:req.params.id}).populate("user")
+    let post = await postModel.findOne({_id:req.params.id})
     res.render('editpost',{post})
+})
+
+app.get ('/postdelete/:id', isLoggedin, async(req,res)=>{
+   // res.send('deleted')
+    const {id}= req.params
+    let deletedpost = await postModel.findOneAndDelete({_id:id})
+    res.redirect('/profile')
 })
 
 app.post('/register',async (req,res)=>{
@@ -72,6 +86,9 @@ app.post('/login', async (req,res)=>{
 
 app.post('/createPost', isLoggedin, async(req,res)=>{
     let {caption,body} = req.body
+    if (caption==="" || body==="") {
+        return res.redirect('/profile')
+    }
     let user = await userModel.findOne({_id:req.user.userid})
     let post = await postModel.create({
         user: user._id,
@@ -89,34 +106,51 @@ app.get('/editProfile', isLoggedin, async(req,res)=>{
     res.render('editprofile',{user})
 })
 
-app.post('/updateProfile', isLoggedin, async(req,res)=>{
+app.post('/updateProfile', upload.single ('image') ,isLoggedin, async(req,res)=>{
     let {username,name} = req.body
-    console.log({username,name})
+    console.log(req.file)
     await userModel.findOneAndUpdate({_id:req.user.userid},{username,name},{new:true})
     res.redirect('/profile')
 })
 
 app.post ('/updatePost/:id', isLoggedin, async(req,res)=>{
     let {caption,body} = req.body
-    let post = await postModel.findOneAndUpdate({_id:req.params.id},{caption,body}, {new:true}).populate('user')
+    let post = await postModel.findOneAndUpdate({_id:req.params.id},{caption,body}, {new:true})//.populate('user')
     res.redirect('/profile')
 })
 
-app.get('/logout', (req,res)=>{
+app.get('/logout', isLoggedin, (req,res)=>{
     res.cookie('token',"")
     res.redirect('/login')
 })
 
 
 function isLoggedin(req,res,next){
-    if (req.cookies.token === "") res.redirect("/login")
+    const token  = req.cookies.token
+    if(!token){
+        return res.redirect("/login")
+    }
     else{
         let data = jwt.verify( req.cookies.token,"Secret")
         req.user = data
         next()
-}
+}}
 
-}
+app.get('/test', isLoggedin, (req,res)=>{
+    res.render('test')
+})
+
+app.post ('/uploadFile', upload.single('image'), isLoggedin,async (req,res)=>{
+  const {filename} = req.file
+  let user = await userModel.findOneAndUpdate({_id:req.user.userid},{pfp:filename})
+  res.redirect('/profile')
+})
+
+app.post ('/removeProfilePic', isLoggedin, async (req,res)=>{
+    let user = await userModel.findOneAndUpdate ({_id:req.user.userid},{pfp:'default.jpg'})
+    res.redirect('/profile')
+})
+
 app.listen('3000',()=>{
     console.log('Listening...')
 })

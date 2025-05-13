@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,10 +16,16 @@
   <header class="w-full flex justify-end p-4 bg-zinc-800 shadow">
     <a href="/editProfile" class="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-md transition">Edit Profile</a>
   </header>
+  <header class="w-full flex justify-end p-4 bg-zinc-800 shadow">
+    <a href="/test" class="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-md transition">Edit Profile Picture</a>
+  </header>
 
   <!-- Main Content -->
   <main class="flex-1 p-6">
     <div class="max-w-3xl mx-auto bg-zinc-800 rounded-2xl shadow-xl p-8">
+      <div class="flex justify-center mb-4">
+          <img class="w-24 h-24 rounded-full object-cover border-4 border-zinc-700 shadow-lg" src="/images/uploads/<%= user.pfp %>" alt="">
+      </div>
       <h3 class="text-3xl font-semibold mb-4 text-center">Hello, <%= user.username %> 🤛 {<%= user.name %>}</h3>
       <p class="text-center mb-6 text-zinc-300">What's your cerebral activity sounding like?</p>
       
@@ -54,6 +61,7 @@
                     <div class ="btns flex">
                         <a class="text-blue-500" href="/like/<%= post._id %>"><%= post.likes.indexOf(user._id)? "Like" : "Unike" %></a>
                         <a class = "text-zinc-600" href="/postedit/<%= post._id %>">Edit</a>
+                        <a class = "text-zinc-600" href="/postdelete/<%= post._id %>">Delete</a>
                     </div>
                 </div>
               <%}) %>

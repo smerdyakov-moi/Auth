@@ -6,6 +6,9 @@ const userSchema = mongoose.Schema({
     email: String,
     age: Number,
     password: String,
+    pfp:{type:String,
+        default: 'default.jpg'
+    },
     posts:[
         {
             type:mongoose.Schema.Types.ObjectId,
