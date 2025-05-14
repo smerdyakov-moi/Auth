@@ -179,7 +179,7 @@ app.post ('/removeProfilePic', isLoggedin, async (req,res)=>{
 
 app.use((req, res) => {
   res.status(404).render('error', { title: 'Page Not Found' });
-})
+}) //error route handler
 
 
 app.listen('3000',()=>{
