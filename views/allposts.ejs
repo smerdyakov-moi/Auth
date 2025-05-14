@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dark Green Themed Page</title>
+</head>
+<body style="background-color: #0b1c14; color: #e8f5e9; font-family: Arial, sans-serif; padding: 2rem;">
+
+  <h1 style="text-align: center; color: #a8e6cf;">Other Users' Posts</h1>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+    
+    <% users.forEach(user => { %>
+      <div style="background-color: #122c21; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        <h2 style="margin-bottom: 0.5rem; color: #81c784;"><%= user.name %> (@<%= user.username %>)</h2>
+        <h3 style="margin: 1rem 0 0.5rem; font-size: 1.1rem; color: #66bb6a;">Posts:</h3>
+
+        <% if (user.posts.length === 0) { %>
+          <p style="color: #ccc;">No posts yet.</p>
+        <% } else { %>
+          <ul style="list-style: none; padding: 0;">
+            <% user.posts.forEach(post => { %>
+              <li style="padding: 0.5rem 0; border-bottom: 1px solid #1d4032;">
+                <strong><%= post.caption %></strong><br />
+                <span><%= post.body %></span>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #aaa; margin-top: 0.3rem;">
+                  <span><%= post.likes.length %> likes</span>
+                  <div>
+                    <a href="/showallpostslike/<%= post._id %>" style="display: inline-block; padding: 0.3rem 0.8rem; background-color: #2ecc71; color: #0b1c14; border-radius: 4px; text-decoration: none;">Like</a>
+                  </div>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+
+      </div>
+    <% }) %>
+
+  </div>
+
+</body>
+</html>

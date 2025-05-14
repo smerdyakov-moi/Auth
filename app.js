@@ -27,6 +27,24 @@ app.get ('/profile',isLoggedin,async (req,res)=>{
     res.render('profile',{user})
 })
 
+app.get('/showallposts', isLoggedin, async (req, res) => {
+    let users = await userModel.find().populate("posts"); //.populate("posts")
+    const filteredUsers = users.filter(user => user._id.toString() !== req.user.userid);
+    res.render('allposts', { users: filteredUsers }); 
+   
+})
+
+app.get('/showallpostslike/:id', isLoggedin, async (req, res) => {
+    let post = await postModel.findOne({_id:req.params.id})
+    
+    if (post.likes.indexOf(req.user.userid) === -1) {post.likes.push(req.user.userid)} // in array of likes, checking whether the user has already liked the post or not
+    // this is achieved through passing the req.user.userid
+    else {post.likes.splice(post.likes.indexOf(req.user.userid),1)}
+    await post.save()
+    res.redirect('/showallposts')
+   
+})
+
 app.get ('/like/:id',isLoggedin,async (req,res)=>{
     let post = await postModel.findOne({_id:req.params.id})
     
