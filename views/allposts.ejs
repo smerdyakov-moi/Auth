@@ -107,12 +107,14 @@
           <p style="color: #ccc;">No posts yet.</p>
         <% } else { %>
           <ul class="post-list">
-            <% userj.posts.forEach(post => { %>
+            <% userj.posts.reverse().forEach(post => { %>
               <li class="post-item">
                 <strong><%= post.caption %></strong><br />
                 <span><%= post.body %></span>
                 <div class="post-meta">
-                  <span><%= post.likes.length %> likes</span>
+                  <form action="/likers/<%= post._id %>" method="GET" style="display:inline;">
+                      <button type="submit" class="button"><%= post.likes.length %> Likes</button>
+                  </form>
                   <div>
                     <a href="/showallpostslike/<%= post._id %>" class="like-button"><%= post.likes.includes(USER._id) ? "Unlike": "Like" %></a>
                   </div>
