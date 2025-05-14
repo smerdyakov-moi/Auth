@@ -29,8 +29,9 @@ app.get ('/profile',isLoggedin,async (req,res)=>{
 
 app.get('/showallposts', isLoggedin, async (req, res) => {
     let users = await userModel.find().populate("posts"); //.populate("posts")
+    let USER = await userModel.findOne({_id:req.user.userid})
     const filteredUsers = users.filter(user => user._id.toString() !== req.user.userid);
-    res.render('allposts', { userx: filteredUsers }); 
+    res.render('allposts', { userx: filteredUsers, USER}); 
    
 })
 
@@ -175,6 +176,11 @@ app.post ('/removeProfilePic', isLoggedin, async (req,res)=>{
     let user = await userModel.findOneAndUpdate ({_id:req.user.userid},{pfp:'default.jpg'})
     res.redirect('/profile')
 })
+
+app.use((req, res) => {
+  res.status(404).render('error', { title: 'Page Not Found' });
+})
+
 
 app.listen('3000',()=>{
     console.log('Listening...')

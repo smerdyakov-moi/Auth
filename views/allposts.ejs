@@ -114,7 +114,7 @@
                 <div class="post-meta">
                   <span><%= post.likes.length %> likes</span>
                   <div>
-                    <a href="/showallpostslike/<%= post._id %>" class="like-button">Like</a>
+                    <a href="/showallpostslike/<%= post._id %>" class="like-button"><%= post.likes.includes(USER._id) ? "Unlike": "Like" %></a>
                   </div>
                 </div>
               </li>
