@@ -30,7 +30,7 @@ app.get ('/profile',isLoggedin,async (req,res)=>{
 app.get('/showallposts', isLoggedin, async (req, res) => {
     let users = await userModel.find().populate("posts"); //.populate("posts")
     const filteredUsers = users.filter(user => user._id.toString() !== req.user.userid);
-    res.render('allposts', { users: filteredUsers }); 
+    res.render('allposts', { userx: filteredUsers }); 
    
 })
 
@@ -43,6 +43,13 @@ app.get('/showallpostslike/:id', isLoggedin, async (req, res) => {
     await post.save()
     res.redirect('/showallposts')
    
+})
+
+app.get ('/likers/:postid',isLoggedin, async(req,res)=>{
+    let post= await postModel.findOne({_id:req.params.postid}).populate('likes')
+    let {username} = await userModel.findOne({_id:req.user.userid})
+    res.render('likedby',{post,username})
+
 })
 
 app.get ('/like/:id',isLoggedin,async (req,res)=>{

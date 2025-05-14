@@ -87,44 +87,17 @@
   </style>
 </head>
 <body>
-
-  <h1>Other Users' Posts</h1>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
-    
-    <% userx.forEach( (userj) => { %>
-      <div class="user-card">
-        <!-- User Information Section -->
-        <div class="user-info">
-          <img class="profile-image" src="/images/uploads/<%= userj.pfp %>" alt="Profile Picture">
-          <div class="user-details">
-            <h2><%= userj.name %> (@<%= userj.username %>)</h2>
-            <h3>Posts:</h3>
-          </div>
+<p>
+<h1> Liked by: </h1>
+  <% post.likes.forEach(function(user) { %>
+    <div class="user-card">
+          <img class="profile-image" src="/images/uploads/<%= user.pfp %>" alt="Profile Picture">
+            <h2 class="mb-1"><%= user.name %> <%= username === user.username ? "(You)" : "" %>
+            <%= username !== user.username ? "(@"+ user.username +")" : "" %></h2>
         </div>
-        
-        <% if (userj.posts.length === 0) { %>
-          <p style="color: #ccc;">No posts yet.</p>
-        <% } else { %>
-          <ul class="post-list">
-            <% userj.posts.forEach(post => { %>
-              <li class="post-item">
-                <strong><%= post.caption %></strong><br />
-                <span><%= post.body %></span>
-                <div class="post-meta">
-                  <span><%= post.likes.length %> likes</span>
-                  <div>
-                    <a href="/showallpostslike/<%= post._id %>" class="like-button">Like</a>
-                  </div>
-                </div>
-              </li>
-            <% }) %>
-          </ul>
-        <% } %>
-      </div>
-    <% }) %>
+  <% }) %>
+</p>
 
-  </div>
 
 </body>
 </html>
