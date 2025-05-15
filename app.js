@@ -22,6 +22,31 @@ app.get('/',(req,res)=>{
     res.render('index')
 })
 
+app.get ('/deleteProfile', isLoggedin, async(req,res)=>{
+    //res.send('rara')
+    let user = await userModel.findOne({_id:req.user.userid})
+    for (let i=0;i<user.posts.length;i++){
+        let deletedpost = await postModel.findOneAndDelete({_id:user.posts[i]})
+    }
+    let userx = await userModel.findOneAndDelete({_id:req.user.userid})
+    res.redirect('/login')
+})
+
+app.get ('/postdelete/:id', isLoggedin, async(req,res)=>{
+   // res.send('deleted')
+    const {id}= req.params
+    let user = await userModel.findOne({_id:req.user.userid})
+    if(!user.posts.includes(id)){
+        return res.status(400).send('Access not granted')
+    }
+    
+    user.posts = user.posts.filter(pid => pid.toString() !== id); //this code even removes the post reference from the user reference 'posts'
+    await user.save()
+
+    let deletedpost = await postModel.findOneAndDelete({_id:id})
+    res.redirect('/profile')
+})
+
 app.get ('/profile',isLoggedin,async (req,res)=>{
     let user = await userModel.findOne({_id:req.user.userid}).populate("posts")
     res.render('profile',{user})
@@ -29,7 +54,7 @@ app.get ('/profile',isLoggedin,async (req,res)=>{
 
 app.get('/showallposts', isLoggedin, async (req, res) => {
     let users = await userModel.find().populate("posts"); //.populate("posts")
-    let USER = await userModel.findOne({_id:req.user.userid})
+    let USER = await userModel.findOne({_id:req.user.userid}) //for specific logic
     const filteredUsers = users.filter(user => user._id.toString() !== req.user.userid);
     res.render('allposts', { userx: filteredUsers, USER}); 
    
@@ -69,16 +94,15 @@ app.get ('/login', (req,res)=>{
     res.render('login')
 })
 
-app.get('/postedit/:id', async(req,res)=>{
+app.get('/postedit/:id', isLoggedin, async(req,res)=>{
+    const {id}= req.params
+    let user = await userModel.findOne({_id:req.user.userid})
+    if(!user.posts.includes(id)){
+        return res.status(400).send('Access not granted')
+    }
+    
     let post = await postModel.findOne({_id:req.params.id})
     res.render('editpost',{post})
-})
-
-app.get ('/postdelete/:id', isLoggedin, async(req,res)=>{
-   // res.send('deleted')
-    const {id}= req.params
-    let deletedpost = await postModel.findOneAndDelete({_id:id})
-    res.redirect('/profile')
 })
 
 app.post('/register',async (req,res)=>{
@@ -117,9 +141,7 @@ app.post('/createPost', isLoggedin, async(req,res)=>{
     }
     let user = await userModel.findOne({_id:req.user.userid})
     let post = await postModel.create({
-        user: user._id,
-        caption,body,
-
+        caption,body
     })
     user.posts.push(post._id)
     await user.save()
@@ -150,6 +172,10 @@ app.get('/logout', isLoggedin, (req,res)=>{
     res.redirect('/login')
 })
 
+app.get ('/postlength',isLoggedin, async (req,res)=>{
+    let user = await userModel.findOne({_id:req.user.userid})
+    res.send(user.posts.length)
+})
 
 function isLoggedin(req,res,next){
     const token  = req.cookies.token
